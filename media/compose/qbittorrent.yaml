@@ -18,17 +18,18 @@ services:
     environment:
       <<: *common-env
       WEBUI_PORT: "${QBIT_PORT_UI:-8080}"
+      TORRENTING_PORT: "${QBIT_PORT_CONN:-6881}"
     volumes:
       - "${MEDIA_STACK_ROOT:-/data/apps}/qbittorrent/config:/config"
-      - "${MEDIA_STACK_ROOT:-/data/apps}/qbittorrent/downloads:/downloads"
+      - "${MEDIA_DOWNLOADS_DIR:-${MEDIA_STACK_ROOT:-/data/apps}/qbittorrent/downloads}:/downloads"
       - "${MEDIA_STACK_ROOT:-/data/apps}/qbittorrent/watch:/watch"
       - "${MEDIA_STACK_ROOT:-/data/apps}/qbittorrent/logs:/logs"
     ports:
-      - "${QBIT_PORT_UI:-8080}:8080"
-      - "6881:6881"
-      - "6881:6881/udp"
+      - "${QBIT_PORT_UI:-8080}:${QBIT_PORT_UI:-8080}"
+      - "${QBIT_PORT_CONN:-6881}:${QBIT_PORT_CONN:-6881}"
+      - "${QBIT_PORT_CONN:-6881}:${QBIT_PORT_CONN:-6881}/udp"
     healthcheck:
-      test: ["CMD", "curl", "-fsS", "http://localhost:8080"]
+      test: ["CMD", "curl", "-fsS", "http://localhost:${QBIT_PORT_UI:-8080}"]
       interval: 30s
       timeout: 5s
       retries: 5

@@ -19,7 +19,7 @@ services:
     volumes:
       - "${MEDIA_STACK_ROOT:-/data/apps}/moviepilot/config:/config"
       - "${MEDIA_STACK_ROOT:-/data/apps}/moviepilot/data:/data"
-      - "${MEDIA_STACK_ROOT:-/data/apps}/qbittorrent/downloads:/downloads:rw"
+      - "${MEDIA_DOWNLOADS_DIR:-${MEDIA_STACK_ROOT:-/data/apps}/qbittorrent/downloads}:/downloads:rw"
       - "${MEDIA_STACK_ROOT:-/data/apps}/moviepilot/logs:/logs"
     ports:
       - "${MOVIEPILOT_PORT:-3000}:3000"
