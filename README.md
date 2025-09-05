@@ -8,16 +8,13 @@
 ## 约定
 - 全局时区：`Asia/Shanghai`
 - 数据根路径：`/data/apps/<app>/{config,data,logs,cache,downloads,media,secrets}`
-- 反代网络：`proxy`（先创建：`docker network create proxy`）
+- 网络模式：使用默认bridge网络，通过端口映射访问服务
 
 ## 快速开始
 ```bash
 # 克隆
 git clone <your-repo-url> homelab-stacks
 cd homelab-stacks
-
-# 创建 proxy 网络（若未创建）
-docker network create proxy || true
 
 # 启动 media 栈
 cd media/compose

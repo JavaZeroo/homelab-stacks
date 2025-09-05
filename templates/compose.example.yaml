@@ -13,9 +13,10 @@ x-logging: &logging
     driver: json-file
     options: { max-size: "10m", max-file: "3" }
 
-networks:
-  proxy: { external: true }
-  internal: { internal: true }
+# 网络配置说明：
+# - 使用默认 Docker bridge 网络
+# - 通过端口映射提供服务访问
+# - 服务间通信使用宿主机IP
 
 services:
   yourapp:
@@ -26,7 +27,6 @@ services:
       - "${MEDIA_STACK_ROOT:-/data/apps}/yourapp/config:/config"
       - "${MEDIA_STACK_ROOT:-/data/apps}/yourapp/data:/data"
       - "${MEDIA_STACK_ROOT:-/data/apps}/yourapp/logs:/logs"
-    networks: [internal, proxy]
     ports:
       - "12345:12345"
     <<: [*restart, *logging]

@@ -11,10 +11,6 @@ x-logging: &logging
     driver: json-file
     options: { max-size: "10m", max-file: "3" }
 
-networks:
-  proxy: { external: true }
-  media: { internal: true }
-
 services:
   jellyfin:
     image: jellyfin/jellyfin:latest
@@ -27,7 +23,6 @@ services:
       - "${MEDIA_STACK_ROOT:-/data/apps}/jellyfin/media:/media:ro"
     ports:
       - "${JELLYFIN_PORT_HTTP:-8096}:8096"
-    networks: [media, proxy]
     healthcheck:
       test: ["CMD", "curl", "-fsS", "http://localhost:8096/health"]
       interval: 30s
@@ -45,8 +40,6 @@ services:
       - "${MEDIA_STACK_ROOT:-/data/apps}/jellyseerr/logs:/logs"
     ports:
       - "${JELLYSEERR_PORT:-5055}:5055"
-    networks: [media, proxy]
-    depends_on: [jellyfin]
     healthcheck:
       test: ["CMD", "curl", "-fsS", "http://localhost:5055/api/v1/status"]
       interval: 30s
