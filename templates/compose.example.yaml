@@ -1,0 +1,32 @@
+version: "3.9"
+
+x-env: &common-env
+  PUID: "${PUID:-1000}"
+  PGID: "${PGID:-1000}"
+  TZ:   "${TZ:-Asia/Shanghai}"
+
+x-restart: &restart
+  restart: unless-stopped
+
+x-logging: &logging
+  logging:
+    driver: json-file
+    options: { max-size: "10m", max-file: "3" }
+
+networks:
+  proxy: { external: true }
+  internal: { internal: true }
+
+services:
+  yourapp:
+    image: your/image:latest
+    container_name: yourapp
+    environment: *common-env
+    volumes:
+      - "${MEDIA_STACK_ROOT:-/data/apps}/yourapp/config:/config"
+      - "${MEDIA_STACK_ROOT:-/data/apps}/yourapp/data:/data"
+      - "${MEDIA_STACK_ROOT:-/data/apps}/yourapp/logs:/logs"
+    networks: [internal, proxy]
+    ports:
+      - "12345:12345"
+    <<: [*restart, *logging]
