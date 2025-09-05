@@ -20,11 +20,11 @@ services:
       - "${MEDIA_STACK_ROOT:-/data/apps}/jellyfin/config:/config"
       - "${MEDIA_STACK_ROOT:-/data/apps}/jellyfin/cache:/cache"
       - "${MEDIA_STACK_ROOT:-/data/apps}/jellyfin/logs:/logs"
-      - "${MEDIA_STACK_ROOT:-/data/apps}/jellyfin/media:/media:ro"
+      - "${MEDIA_DOWNLOADS_DIR:-${MEDIA_STACK_ROOT:-/data/apps}/qbittorrent/downloads}:/media:ro"
     ports:
       - "${JELLYFIN_PORT_HTTP:-8096}:8096"
     healthcheck:
-      test: ["CMD", "curl", "-fsS", "http://localhost:8096/health"]
+      test: ["CMD", "curl", "-fsS", "http://localhost:${JELLYFIN_PORT_HTTP:-8096}/health"]
       interval: 30s
       timeout: 5s
       retries: 10
@@ -41,7 +41,7 @@ services:
     ports:
       - "${JELLYSEERR_PORT:-5055}:5055"
     healthcheck:
-      test: ["CMD", "curl", "-fsS", "http://localhost:5055/api/v1/status"]
+      test: ["CMD", "curl", "-fsS", "http://localhost:${JELLYSEERR_PORT:-5055}/api/v1/status"]
       interval: 30s
       timeout: 5s
       retries: 10
