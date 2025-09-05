@@ -19,8 +19,14 @@ docker compose -f media-server.yaml up -d
 ```
 
 ## 环境变量
-可以通过环境变量自定义端口：
+可以通过环境变量自定义端口和目录：
+- `MEDIA_STACK_ROOT` - 持久化数据根目录 (默认: `/data/apps`)
+- `MEDIA_DOWNLOADS_DIR` - 下载内容共享目录 (默认: `${MEDIA_STACK_ROOT}/qbittorrent/downloads`)
+
+端口：
 - `QBIT_PORT_UI` - qBittorrent Web UI 端口 (默认: 8080)
+- `QBIT_PORT_CONN` - qBittorrent TCP/UDP 连接端口 (默认: 6881)
 - `MOVIEPILOT_PORT` - MoviePilot 端口 (默认: 3000)
 - `JELLYFIN_PORT_HTTP` - Jellyfin HTTP 端口 (默认: 8096)
 - `JELLYSEERR_PORT` - Jellyseerr 端口 (默认: 5055)
+
