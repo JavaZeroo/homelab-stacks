@@ -1,0 +1,16 @@
+# Node / editor / OS
+.DS_Store
+*.swp
+.idea/
+.vscode/
+
+# Python venv or build
+.venv/
+__pycache__/
+
+# Docker
+*/volumes/
+*/backup/
+
+# Do NOT commit runtime data. Config-only repo:
+# 生产数据、密钥统一在 /data/apps 下（不进 Git）

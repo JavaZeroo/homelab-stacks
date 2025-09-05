@@ -1,0 +1,37 @@
+version: "3.9"
+
+x-env: &common-env
+  PUID: "${PUID:-1000}"
+  PGID: "${PGID:-1000}"
+  TZ:   "${TZ:-Asia/Shanghai}"
+
+x-restart: &restart { restart: unless-stopped }
+x-logging: &logging
+  logging:
+    driver: json-file
+    options: { max-size: "10m", max-file: "3" }
+
+networks:
+  proxy: { external: true }
+  media: { internal: true }
+
+services:
+  moviepilot:
+    image: jxxghp/moviepilot:latest
+    container_name: moviepilot
+    environment: *common-env
+    volumes:
+      - "${MEDIA_STACK_ROOT:-/data/apps}/moviepilot/config:/config"
+      - "${MEDIA_STACK_ROOT:-/data/apps}/moviepilot/data:/data"
+      - "${MEDIA_STACK_ROOT:-/data/apps}/qbittorrent/downloads:/downloads:rw"
+      - "${MEDIA_STACK_ROOT:-/data/apps}/moviepilot/logs:/logs"
+    ports:
+      - "${MOVIEPILOT_PORT:-3000}:3000"
+    networks: [media, proxy]
+    depends_on: [ ]
+    healthcheck:
+      test: ["CMD", "curl", "-fsS", "http://localhost:3000"]
+      interval: 30s
+      timeout: 5s
+      retries: 10
+    <<: [*restart, *logging]
