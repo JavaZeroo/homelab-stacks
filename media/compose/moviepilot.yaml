@@ -11,10 +11,6 @@ x-logging: &logging
     driver: json-file
     options: { max-size: "10m", max-file: "3" }
 
-networks:
-  proxy: { external: true }
-  media: { internal: true }
-
 services:
   moviepilot:
     image: jxxghp/moviepilot:latest
@@ -27,8 +23,6 @@ services:
       - "${MEDIA_STACK_ROOT:-/data/apps}/moviepilot/logs:/logs"
     ports:
       - "${MOVIEPILOT_PORT:-3000}:3000"
-    networks: [media, proxy]
-    depends_on: [ ]
     healthcheck:
       test: ["CMD", "curl", "-fsS", "http://localhost:3000"]
       interval: 30s
