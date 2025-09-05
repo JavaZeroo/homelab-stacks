@@ -27,6 +27,7 @@ services:
       - "${MEDIA_STACK_ROOT:-/data/apps}/yourapp/config:/config"
       - "${MEDIA_STACK_ROOT:-/data/apps}/yourapp/data:/data"
       - "${MEDIA_STACK_ROOT:-/data/apps}/yourapp/logs:/logs"
+      - "${MEDIA_DOWNLOADS_DIR:-${MEDIA_STACK_ROOT:-/data/apps}/qbittorrent/downloads}:/downloads"
     ports:
-      - "12345:12345"
+      - "${YOURAPP_PORT:-12345}:12345"
     <<: [*restart, *logging]
