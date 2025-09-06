@@ -2,7 +2,7 @@
 
 包含服务：
 - qBittorrent (下载器) - 端口 8080
-- MoviePilot (下载编排) - 端口 3000
+- MoviePilot v2 (下载编排，附 PostgreSQL/Redis) - 端口 3000
 - Jellyfin (媒体服务器) - 端口 8096
 - Jellyseerr (点播/请求管理) - 端口 5055
 
@@ -26,6 +26,7 @@ docker compose -f compose/media-server.yaml up -d
 - `QBIT_PORT_UI` - qBittorrent Web UI 端口 (默认: 8080)
 - `QBIT_PORT_CONN` - qBittorrent TCP/UDP 连接端口 (默认: 6881)
 - `MOVIEPILOT_PORT` - MoviePilot 端口 (默认: 3000)
+- `MOVIEPILOT_API_PORT` - MoviePilot API 端口 (默认: 3001)
 - `JELLYFIN_PORT_HTTP` - Jellyfin HTTP 端口 (默认: 8096)
 - `JELLYSEERR_PORT` - Jellyseerr 端口 (默认: 5055)
 
