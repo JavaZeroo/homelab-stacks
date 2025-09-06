@@ -12,9 +12,7 @@
 
 ## 启动
 ```bash
-docker compose -f compose/qbittorrent.yaml up -d
-docker compose -f compose/moviepilot.yaml up -d
-docker compose -f compose/media-server.yaml up -d
+docker compose -f compose/qbittorrent.yaml -f compose/moviepilot.yaml -f compose/media-server.yaml up -d
 ```
 
 ## 环境变量
