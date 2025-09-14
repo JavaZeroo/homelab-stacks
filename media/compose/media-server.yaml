@@ -20,7 +20,7 @@ services:
       - "${MEDIA_STACK_ROOT:-/data/apps}/jellyfin/config:/config"
       - "${MEDIA_STACK_ROOT:-/data/apps}/jellyfin/cache:/cache"
       - "${MEDIA_STACK_ROOT:-/data/apps}/jellyfin/logs:/logs"
-      - "${MEDIA_DOWNLOADS_DIR:-${MEDIA_STACK_ROOT:-/data/apps}/qbittorrent/downloads}:/media:ro"
+      - "${MEDIA_STACK_ROOT:-/data/apps}/media:/media:ro"
     ports:
       - "${JELLYFIN_PORT_HTTP:-8096}:8096"
     healthcheck:

@@ -20,8 +20,9 @@ services:
       WEBUI_PORT: "${QBIT_PORT_UI:-8080}"
       TORRENTING_PORT: "${QBIT_PORT_CONN:-6881}"
     volumes:
+      - "${MEDIA_STACK_ROOT:-/data/apps}/media:/media" # 媒体文件共享目录
+      - "${MEDIA_STACK_ROOT:-/data/apps}/media/downloads:/downloads" # 同时保证qbit的默认下载目录不变
       - "${MEDIA_STACK_ROOT:-/data/apps}/qbittorrent/config:/config"
-      - "${MEDIA_DOWNLOADS_DIR:-${MEDIA_STACK_ROOT:-/data/apps}/qbittorrent/downloads}:/downloads"
       - "${MEDIA_STACK_ROOT:-/data/apps}/qbittorrent/watch:/watch"
       - "${MEDIA_STACK_ROOT:-/data/apps}/qbittorrent/logs:/logs"
     ports:

@@ -1,0 +1,36 @@
+version: "3.9"
+
+x-env: &common-env
+  TZ: "${TZ:-Asia/Shanghai}"
+
+x-restart: &restart { restart: unless-stopped }
+x-logging: &logging
+  logging:
+    driver: json-file
+    options: { max-size: "10m", max-file: "3" }
+
+services:
+  nginx:
+    image: nginx:1.27-alpine
+    container_name: nginx
+    environment: *common-env
+    command: ["/bin/sh", "-c", "nginx -t && exec nginx -g 'daemon off;' "]
+    ports:
+      - "${NGINX_PORT_HTTPS:-9080}:9080"
+      - "${NGINX_PORT_HTTP_REDIRECT:-9980}:9980"
+      - "${NGINX_PORT_IMMICH:-9088}:9088"
+    volumes:
+      # 主配置文件（拆分为 conf.d/*.conf）
+      - "../config/conf.d/ssl.conf:/etc/nginx/conf.d/ssl.conf:ro"
+      - "../config/conf.d/immich.conf:/etc/nginx/conf.d/immich.conf:ro"
+      - "../config/conf.d/locations:/etc/nginx/conf.d/locations:ro"
+
+      # 证书路径（宿主机实际路径）
+      - "/data/certs:/root/certs:ro"
+
+    healthcheck:
+      test: ["CMD", "nginx", "-t"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    <<: [*restart, *logging]

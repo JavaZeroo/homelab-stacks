@@ -18,7 +18,6 @@ docker compose -f compose/qbittorrent.yaml -f compose/moviepilot.yaml -f compose
 ## 环境变量
 可以通过环境变量自定义端口和目录：
 - `MEDIA_STACK_ROOT` - 持久化数据根目录 (默认: `/data/apps`)
-- `MEDIA_DOWNLOADS_DIR` - 下载内容共享目录 (默认: `${MEDIA_STACK_ROOT}/qbittorrent/downloads`)
 
 端口：
 - `QBIT_PORT_UI` - qBittorrent Web UI 端口 (默认: 8080)
