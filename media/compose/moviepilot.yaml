@@ -13,6 +13,8 @@ x-logging: &logging
 
 services:
   moviepilot:
+    stdin_open: true
+    tty: true
     image: jxxghp/moviepilot-v2:latest
     container_name: moviepilot-v2
     hostname: moviepilot-v2
@@ -30,9 +32,9 @@ services:
       CACHE_BACKEND_TYPE: redis
       CACHE_BACKEND_URL: "redis://:${MOVIEPILOT_REDIS_PASSWORD:-redis_password}@redis:6379"
     volumes:
+      - "${MEDIA_STACK_ROOT:-/data/apps}/media:/media"
       - "${MEDIA_STACK_ROOT:-/data/apps}/moviepilot/config:/config"
       - "${MEDIA_STACK_ROOT:-/data/apps}/moviepilot/cache:/moviepilot/.cache/ms-playwright"
-      - "${MEDIA_DOWNLOADS_DIR:-/data/apps/qbittorrent/downloads}:/downloads"
       - "${MEDIA_STACK_ROOT:-/data/apps}/qbittorrent/config/qBittorrent/data/BT_backup:/BT_backup"
       - "${MEDIA_STACK_ROOT:-/data/apps}/transmission/config/torrents:/torrents"
       - "/var/run/docker.sock:/var/run/docker.sock:ro"
