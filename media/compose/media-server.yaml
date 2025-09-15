@@ -15,12 +15,16 @@ services:
   jellyfin:
     image: jellyfin/jellyfin:latest
     container_name: jellyfin
+    group_add:
+      - '993'
     environment: *common-env
     volumes:
       - "${MEDIA_STACK_ROOT:-/data/apps}/jellyfin/config:/config"
       - "${MEDIA_STACK_ROOT:-/data/apps}/jellyfin/cache:/cache"
       - "${MEDIA_STACK_ROOT:-/data/apps}/jellyfin/logs:/logs"
       - "${MEDIA_STACK_ROOT:-/data/apps}/media:/media:ro"
+    devices:
+      - /dev/dri/renderD128:/dev/dri/renderD128
     ports:
       - "${JELLYFIN_PORT_HTTP:-8096}:8096"
     healthcheck:
