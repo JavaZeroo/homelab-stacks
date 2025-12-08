@@ -1,7 +1,7 @@
 # homelab-stacks
 
 集中管理自托管服务的编排（Docker Compose）。  
-- **按栈分类**：`media/`、`nginx/`、`file/`、`traefik/`、`monitoring/` ...
+- **按栈分类**：`media/`、`nginx/`、`homepages/`、`proxy/`、`monitoring/` ...
 - **配置进 Git**：本仓库只存放 Compose 与 .env（不含运行数据）
 - **运行数据**：统一放在宿主 `/data/apps/<app>/...`（不进 Git）
 
@@ -25,4 +25,8 @@ docker compose -f compose/media-server.yaml up -d
 # 启动 nginx 栈（反向代理）
 cd ../nginx
 docker compose -f compose/nginx.yaml up -d
+
+# 启动 homepage 栈（仪表板）
+cd ../homepages
+docker compose -f compose/homepage.yaml up -d
 ```

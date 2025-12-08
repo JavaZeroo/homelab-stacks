@@ -25,8 +25,7 @@ services:
       - "${MEDIA_STACK_ROOT:-/data/apps}/media:/media:ro"
     devices:
       - /dev/dri/renderD128:/dev/dri/renderD128
-    ports:
-      - "${JELLYFIN_PORT_HTTP:-8096}:8096"
+    network_mode: host
     healthcheck:
       test: ["CMD", "curl", "-fsS", "http://localhost:${JELLYFIN_PORT_HTTP:-8096}/health"]
       interval: 30s
