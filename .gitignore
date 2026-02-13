@@ -12,5 +12,9 @@ __pycache__/
 */volumes/
 */backup/
 
+# Valheim Server
+valheim-server/config
+valheim-server/data
+
 # Do NOT commit runtime data. Config-only repo:
 # 生产数据、密钥统一在 /data/apps 下（不进 Git）
