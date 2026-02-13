@@ -1,0 +1,41 @@
+version: "3.9"
+
+x-env: &common-env
+  PUID: "${PUID:-1000}"
+  PGID: "${PGID:-1000}"
+  TZ:   "${TZ:-Asia/Shanghai}"
+
+x-restart: &restart { restart: unless-stopped }
+x-logging: &logging
+  logging:
+    driver: json-file
+    options: { max-size: "10m", max-file: "3" }
+
+services:
+  portainer:
+    image: portainer/portainer-ce:latest
+    container_name: portainer
+    environment: *common-env
+    ports:
+      - "9000:9000"        # Web 管理界面： http://服务器IP:9000
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - "${DOCKER_STACK_ROOT:-/data/apps}/portainer/data:/data"
+    <<: [*restart, *logging]
+
+  watchtower:
+    image: containrrr/watchtower
+    container_name: watchtower
+    environment: *common-env
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    command:
+      # 解释：
+      # --cleanup      更新后删除旧镜像
+      # --interval 300 每 300 秒检查一次（你可以改成 1800=30 分钟 之类）
+      # --label-enable 只更新打了 com.centurylinklabs.watchtower.enable=true 的容器
+      - --cleanup
+      - --interval
+      - "300"
+      - --label-enable
+    <<: [*restart, *logging]
