@@ -13,21 +13,13 @@ services:
     container_name: nginx
     environment: *common-env
     command: ["/bin/sh", "-c", "nginx -t && exec nginx -g 'daemon off;' "]
-
-    # Host 模式
     network_mode: host
-
     volumes:
-      # 主配置文件（拆分为 conf.d/*.conf）
-      - "../config/conf.d/:/etc/nginx/conf.d/:ro"
-
-      # 证书路径（宿主机实际路径）
+      - "./config/conf.d/:/etc/nginx/conf.d/:ro"
       - "/data/certs:/root/certs:ro"
-
     healthcheck:
       test: ["CMD", "nginx", "-t"]
       interval: 30s
       timeout: 10s
       retries: 3
-
     <<: [*restart, *logging]

@@ -1,20 +1,33 @@
-# Node / editor / OS
+# ─── Environment files (contain secrets) ──────────────
+# 忽略所有 .env（根目录和各 stack 目录下），但保留 .env.example
+.env
+**/.env
+!.env.example
+
+# ─── OS / Editor ──────────────────────────────────────
 .DS_Store
+Thumbs.db
 *.swp
+*.swo
+*~
 .idea/
 .vscode/
 
-# Python venv or build
+# ─── Python / Build ──────────────────────────────────
 .venv/
 __pycache__/
 
-# Docker
+# ─── Docker runtime data ─────────────────────────────
 */volumes/
 */backup/
 
-# Valheim Server
-valheim-server/config
-valheim-server/data
+# ─── Sub-Store runtime data ──────────────────────────
+sub-store/data/*.json
 
-# Do NOT commit runtime data. Config-only repo:
-# 生产数据、密钥统一在 /data/apps 下（不进 Git）
+# ─── Valheim: game saves, backups, server binaries ───
+valheim-server/config/
+valheim-server/data/
+
+# ─── 约定 ────────────────────────────────────────────
+# 本仓库只存放 Compose 编排与配置，不提交运行数据。
+# 生产数据、密钥统一在 /data/apps 下（不进 Git）。

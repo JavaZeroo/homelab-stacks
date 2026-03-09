@@ -1,22 +1,13 @@
-version: "3.9"
-
 x-env: &common-env
-  PUID: "${PUID:-1000}"
-  PGID: "${PGID:-1000}"
+  PUID: "${PUID:-0}"
+  PGID: "${PGID:-0}"
   TZ:   "${TZ:-Asia/Shanghai}"
 
-x-restart: &restart
-  restart: unless-stopped
-
+x-restart: &restart { restart: unless-stopped }
 x-logging: &logging
   logging:
     driver: json-file
     options: { max-size: "10m", max-file: "3" }
-
-# 网络配置说明：
-# - 使用默认 Docker bridge 网络
-# - 通过端口映射提供服务访问
-# - 服务间通信使用宿主机IP
 
 services:
   yourapp:
@@ -24,10 +15,13 @@ services:
     container_name: yourapp
     environment: *common-env
     volumes:
-      - "${MEDIA_STACK_ROOT:-/data/apps}/yourapp/config:/config"
-      - "${MEDIA_STACK_ROOT:-/data/apps}/yourapp/data:/data"
-      - "${MEDIA_STACK_ROOT:-/data/apps}/yourapp/logs:/logs"
-      - "${MEDIA_DOWNLOADS_DIR:-${MEDIA_STACK_ROOT:-/data/apps}/qbittorrent/downloads}:/downloads"
+      - "/data/apps/yourapp/config:/config"
+      - "/data/apps/yourapp/data:/data"
     ports:
       - "${YOURAPP_PORT:-12345}:12345"
+    healthcheck:
+      test: ["CMD", "curl", "-fsS", "http://localhost:12345/health"]
+      interval: 30s
+      timeout: 5s
+      retries: 5
     <<: [*restart, *logging]

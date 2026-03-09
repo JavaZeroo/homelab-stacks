@@ -1,0 +1,158 @@
+x-env: &common-env
+  PUID: "${PUID:-0}"
+  PGID: "${PGID:-0}"
+  TZ:   "${TZ:-Asia/Shanghai}"
+
+x-restart: &restart { restart: unless-stopped }
+x-logging: &logging
+  logging:
+    driver: json-file
+    options: { max-size: "10m", max-file: "3" }
+
+services:
+
+  # ── 下载 ──────────────────────────────────────────
+
+  qbittorrent:
+    image: linuxserver/qbittorrent:4.6.7-libtorrentv1
+    container_name: qbittorrent
+    environment:
+      <<: *common-env
+      WEBUI_PORT: "${QBIT_PORT_UI:-8080}"
+      TORRENTING_PORT: "${QBIT_PORT_CONN:-51324}"
+    volumes:
+      - "${MEDIA_STACK_ROOT:-/data/apps}/media:/media"
+      - "${MEDIA_STACK_ROOT:-/data/apps}/media/downloads:/downloads"
+      - "${MEDIA_STACK_ROOT:-/data/apps}/qbittorrent/config:/config"
+      - "${MEDIA_STACK_ROOT:-/data/apps}/qbittorrent/watch:/watch"
+      - "${MEDIA_STACK_ROOT:-/data/apps}/qbittorrent/logs:/logs"
+    ulimits:
+      nofile:
+        soft: 1048576
+        hard: 1048576
+    healthcheck:
+      test: ["CMD", "curl", "-fsS", "http://localhost:${QBIT_PORT_UI:-8080}"]
+      interval: 30s
+      timeout: 5s
+      retries: 5
+    networks:
+      lan:
+        ipv4_address: 192.168.3.44
+    dns:
+      - 192.168.3.1
+    <<: [*restart, *logging]
+
+  # ── 自动化 ────────────────────────────────────────
+
+  moviepilot:
+    stdin_open: true
+    tty: true
+    image: jxxghp/moviepilot-v2:latest
+    container_name: moviepilot-v2
+    hostname: moviepilot-v2
+    environment:
+      <<: *common-env
+      NGINX_PORT: "3000"
+      PORT: "3001"
+      SUPERUSER: "${MOVIEPILOT_SUPERUSER:-admin}"
+      DB_TYPE: postgresql
+      DB_POSTGRESQL_HOST: postgresql
+      DB_POSTGRESQL_PORT: 5432
+      DB_POSTGRESQL_DATABASE: moviepilot
+      DB_POSTGRESQL_USERNAME: moviepilot
+      DB_POSTGRESQL_PASSWORD: "${MOVIEPILOT_DB_PASSWORD:-pg_password}"
+      CACHE_BACKEND_TYPE: redis
+      CACHE_BACKEND_URL: "redis://:${MOVIEPILOT_REDIS_PASSWORD:-redis_password}@redis:6379"
+    volumes:
+      - "${MEDIA_STACK_ROOT:-/data/apps}/media:/media"
+      - "${MEDIA_STACK_ROOT:-/data/apps}/moviepilot/config:/config"
+      - "${MEDIA_STACK_ROOT:-/data/apps}/moviepilot/cache:/moviepilot/.cache/ms-playwright"
+      - "${MEDIA_STACK_ROOT:-/data/apps}/qbittorrent/config/qBittorrent/data/BT_backup:/BT_backup"
+      - "${MEDIA_STACK_ROOT:-/data/apps}/transmission/config/torrents:/torrents"
+      - "/var/run/docker.sock:/var/run/docker.sock:ro"
+    ports:
+      - "${MOVIEPILOT_PORT:-3000}:3000"
+      - "${MOVIEPILOT_API_PORT:-3001}:3001"
+    depends_on:
+      postgresql:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    <<: [*restart, *logging]
+
+  redis:
+    image: redis:alpine
+    command: redis-server --save 600 1 --requirepass ${MOVIEPILOT_REDIS_PASSWORD:-redis_password}
+    volumes:
+      - "${MEDIA_STACK_ROOT:-/data/apps}/moviepilot/redis:/data"
+    healthcheck:
+      test: ["CMD", "redis-cli", "--raw", "incr", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    <<: [*restart, *logging]
+
+  postgresql:
+    image: postgres:alpine
+    environment:
+      POSTGRES_DB: moviepilot
+      POSTGRES_USER: moviepilot
+      POSTGRES_PASSWORD: "${MOVIEPILOT_DB_PASSWORD:-pg_password}"
+    volumes:
+      - "${MEDIA_STACK_ROOT:-/data/apps}/moviepilot/postgresql:/var/lib/postgresql/data"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U moviepilot -d moviepilot"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    <<: [*restart, *logging]
+
+  # ── 播放 ──────────────────────────────────────────
+
+  jellyfin:
+    image: jellyfin/jellyfin:latest
+    container_name: jellyfin
+    group_add:
+      - '993'
+    environment: *common-env
+    volumes:
+      - "${MEDIA_STACK_ROOT:-/data/apps}/jellyfin/config:/config"
+      - "${MEDIA_STACK_ROOT:-/data/apps}/jellyfin/cache:/cache"
+      - "${MEDIA_STACK_ROOT:-/data/apps}/jellyfin/logs:/logs"
+      - "${MEDIA_STACK_ROOT:-/data/apps}/media:/media:ro"
+    devices:
+      - /dev/dri/renderD128:/dev/dri/renderD128
+    network_mode: host
+    healthcheck:
+      test: ["CMD", "curl", "-fsS", "http://localhost:${JELLYFIN_PORT_HTTP:-8096}/health"]
+      interval: 30s
+      timeout: 5s
+      retries: 10
+    <<: [*restart, *logging]
+
+  jellyseerr:
+    image: fallenbagel/jellyseerr:latest
+    container_name: jellyseerr
+    environment: *common-env
+    volumes:
+      - "${MEDIA_STACK_ROOT:-/data/apps}/jellyseerr/config:/app/config"
+      - "${MEDIA_STACK_ROOT:-/data/apps}/jellyseerr/data:/app/data"
+      - "${MEDIA_STACK_ROOT:-/data/apps}/jellyseerr/logs:/logs"
+    ports:
+      - "${JELLYSEERR_PORT:-5055}:5055"
+    healthcheck:
+      test: ["CMD", "curl", "-fsS", "http://localhost:${JELLYSEERR_PORT:-5055}/api/v1/status"]
+      interval: 30s
+      timeout: 5s
+      retries: 10
+    <<: [*restart, *logging]
+
+networks:
+  lan:
+    driver: macvlan
+    driver_opts:
+      parent: br0
+    ipam:
+      config:
+        - subnet: 192.168.3.0/24
+          gateway: 192.168.3.1
