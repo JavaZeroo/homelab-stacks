@@ -13,22 +13,18 @@ x-logging: &logging
 
 services:
   qbittorrent:
-    image: lscr.io/linuxserver/qbittorrent:latest
+    image: linuxserver/qbittorrent:4.6.7-libtorrentv1
     container_name: qbittorrent
     environment:
       <<: *common-env
       WEBUI_PORT: "${QBIT_PORT_UI:-8080}"
       TORRENTING_PORT: "${QBIT_PORT_CONN:-6881}"
     volumes:
-      - "${MEDIA_STACK_ROOT:-/data/apps}/media:/media" # 媒体文件共享目录
-      - "${MEDIA_STACK_ROOT:-/data/apps}/media/downloads:/downloads" # 同时保证qbit的默认下载目录不变
+      - "${MEDIA_STACK_ROOT:-/data/apps}/media:/media"
+      - "${MEDIA_STACK_ROOT:-/data/apps}/media/downloads:/downloads"
       - "${MEDIA_STACK_ROOT:-/data/apps}/qbittorrent/config:/config"
       - "${MEDIA_STACK_ROOT:-/data/apps}/qbittorrent/watch:/watch"
       - "${MEDIA_STACK_ROOT:-/data/apps}/qbittorrent/logs:/logs"
-    ports:
-      - "${QBIT_PORT_UI:-8080}:${QBIT_PORT_UI:-8080}"
-      - "${QBIT_PORT_CONN:-6881}:${QBIT_PORT_CONN:-6881}/tcp"
-      - "${QBIT_PORT_CONN:-6881}:${QBIT_PORT_CONN:-6881}/udp"
     ulimits:
       nofile:
         soft: 1048576
@@ -38,4 +34,19 @@ services:
       interval: 30s
       timeout: 5s
       retries: 5
+    networks:
+      lan:
+        ipv4_address: 192.168.3.44
+    dns:
+      - 192.168.3.1
     <<: [*restart, *logging]
+
+networks:
+  lan:
+    driver: macvlan
+    driver_opts:
+      parent: br0
+    ipam:
+      config:
+        - subnet: 192.168.3.0/24
+          gateway: 192.168.3.1
