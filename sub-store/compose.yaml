@@ -14,7 +14,7 @@ services:
     ports:
       - "${SUB_STORE_PORT:-13003}:3001"
     volumes:
-      - "./data:/opt/app/data"
+      - "${SUB_STORE_ROOT:-/data/apps}/sub-store/data:/opt/app/data"
     stdin_open: true
     tty: true
     <<: [*restart, *logging]

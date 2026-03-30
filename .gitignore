@@ -21,8 +21,6 @@ __pycache__/
 */volumes/
 */backup/
 
-# ─── Sub-Store runtime data ──────────────────────────
-sub-store/data/*.json
 
 # ─── Valheim: game saves, backups, server binaries ───
 valheim-server/config/
