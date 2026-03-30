@@ -1,0 +1,17 @@
+services:
+  browserless:
+    image: ghcr.io/browserless/chromium:latest
+    container_name: browserless
+    restart: unless-stopped
+    ports:
+      - "3002:3000"
+    volumes:
+      - ./data:/workspace
+    environment:
+      - TOKEN=${TOKEN}
+      - CONNECTION_TIMEOUT=300000
+      - MAX_CONCURRENT_SESSIONS=${MAX_CONCURRENT_SESSIONS:-10}
+      - TZ=${TZ:-Asia/Shanghai}
+      - DEFAULT_USER_AGENT=${DEFAULT_USER_AGENT}
+      - DEFAULT_IGNORE_HTTPS_ERRORS=${DEFAULT_IGNORE_HTTPS_ERRORS:-true}
+      - DEFAULT_STEALTH=${DEFAULT_STEALTH:-true}
