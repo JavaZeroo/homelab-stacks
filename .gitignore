@@ -4,6 +4,9 @@
 **/.env
 !.env.example
 
+# ─── Basic-auth 密码文件（含哈希，勿提交）─────────────
+**/.htpasswd
+
 # ─── OS / Editor ──────────────────────────────────────
 .DS_Store
 Thumbs.db
